@@ -48,7 +48,8 @@ import requests
 from yarg import json2package
 from yarg.exceptions import HTTPError
 
-from pipreqs import __version__
+# from pipreqs import __version__
+__version__ = '0.0.1'
 
 REGEXP = [
     re.compile(r'^import (.+)$'),
@@ -106,7 +107,7 @@ def get_all_imports(
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
         candidates.append(os.path.basename(root))
-        files = [fn for fn in files if os.path.splitext(fn)[1] == ".py"]
+        files = [fn for fn in files if (os.path.splitext(fn)[1] == ".py" or os.path.splitext(fn)[1] == "")]
 
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
