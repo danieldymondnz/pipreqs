@@ -38,6 +38,7 @@ Options:
 """
 from contextlib import contextmanager
 import os
+import json
 import sys
 import re
 import logging
@@ -90,8 +91,12 @@ def _open(filename=None, mode='r'):
 
 def get_all_imports(
         path, encoding=None, extra_ignore_dirs=None, follow_links=True):
+    
     imports = set()
     raw_imports = set()
+    
+    scripts = {}
+    
     candidates = []
     ignore_errors = True
     ignore_dirs = [".hg", ".svn", ".git", ".tox", "__pycache__", "env", "venv"]
@@ -111,8 +116,13 @@ def get_all_imports(
 
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
+            
+            rel_name = file_name
+            scripts[rel_name] = []
+            
             file_name = os.path.join(root, file_name)
             print("Opened " + file_name)
+            
             with open(file_name, "r", encoding=encoding) as f:
                 contents = f.read()
             try:
@@ -121,8 +131,12 @@ def get_all_imports(
                     if isinstance(node, ast.Import):
                         for subnode in node.names:
                             raw_imports.add(subnode.name)
+                            cleaned_name, _, _ = subnode.name.partition('.')
+                            scripts[rel_name].append(cleaned_name)
                     elif isinstance(node, ast.ImportFrom):
                         raw_imports.add(node.module)
+                        cleaned_name, _, _ = node.module.partition('.')
+                        scripts[rel_name].append(cleaned_name)
             except Exception as exc:
                 if ignore_errors:
                     
@@ -142,6 +156,9 @@ def get_all_imports(
         # as an import.
         cleaned_name, _, _ = name.partition('.')
         imports.add(cleaned_name)
+
+    # Export Script Depends
+    generate_script_dependancies_file(path, scripts)
 
     packages = imports - (set(candidates) & imports)
     logging.debug('Found packages: {0}'.format(packages))
@@ -167,6 +184,10 @@ def generate_requirements_file(path, imports, symbol):
         out_file.write('\n'.join(
             fmt.format(**item) if item['version'] else '{name}'.format(**item)
             for item in imports) + '\n')
+        
+def generate_script_dependancies_file(path, scripts):
+    with _open(path+".pkg.json", "w") as out_file:
+        json.dump(scripts, out_file)
 
 
 def output_requirements(imports, symbol):
