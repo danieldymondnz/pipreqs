@@ -121,7 +121,6 @@ def get_all_imports(
             scripts[rel_name] = []
             
             file_name = os.path.join(root, file_name)
-            print("Opened " + file_name)
             
             with open(file_name, "r", encoding=encoding) as f:
                 contents = f.read()
@@ -141,7 +140,7 @@ def get_all_imports(
                 if ignore_errors:
                     
                     print(exc)
-                    logging.warn("Failed on file: %s" % file_name)
+                    logging.warning("Failed on file: %s" % file_name)
                     continue
                 else:
                     logging.error("Failed on file: %s" % file_name)
@@ -158,7 +157,7 @@ def get_all_imports(
         imports.add(cleaned_name)
 
     # Export Script Depends
-    generate_script_dependancies_file(path, scripts)
+    # generate_script_dependancies_file(path, scripts)
 
     packages = imports - (set(candidates) & imports)
     logging.debug('Found packages: {0}'.format(packages))
