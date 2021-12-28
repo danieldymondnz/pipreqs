@@ -188,7 +188,7 @@ def generate_requirements_file(path, imports, symbol):
 def generate_script_dependancies_file(path, scripts):
     with _open(path+".pkg.json", "w") as out_file:
         json.dump(scripts, out_file)
-    print("SUCCESS")
+    print("SUCCESS: " + path+".pkg.json")
 
 
 def output_requirements(imports, symbol):
