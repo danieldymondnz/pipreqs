@@ -124,7 +124,7 @@ def get_all_imports(
                         raw_imports.add(node.module)
             except Exception as exc:
                 if ignore_errors:
-                    traceback.print_exc(exc)
+                    # traceback.print_exc(exc)
                     logging.warn("Failed on file: %s" % file_name)
                     continue
                 else:
