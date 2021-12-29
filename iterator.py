@@ -23,7 +23,8 @@ dependencies = {}
 
 for item in current_directory:
     
-    if os.path.isdir(item) and item.find("_") != -1:
+    # If item is a non-hidden directory
+    if os.path.isdir(item) and item.find(".") == -1:
         packages.append(item)
         
 num_packages = len(packages)
